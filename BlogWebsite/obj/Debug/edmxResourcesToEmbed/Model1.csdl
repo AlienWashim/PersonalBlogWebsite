@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="BlogModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityType Name="Blog">
+    <Key>
+      <PropertyRef Name="BlogPostId" />
+    </Key>
+    <Property Name="BlogPostId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Title" Type="String" MaxLength="200" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="PostContent" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" Nullable="false" />
+    <Property Name="AuthorName" Type="String" MaxLength="250" FixedLength="true" Unicode="true" Nullable="false" />
+    <Property Name="DatePosted" Type="DateTime" Nullable="false" Precision="3" />
+    <Property Name="CategoryId" Type="Int32" Nullable="false" />
+    <Property Name="ImageUrl" Type="String" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Name="IsPublished" Type="Boolean" Nullable="false" />
+    <NavigationProperty Name="Category" Relationship="Self.FK_Blog_Category" FromRole="Blog" ToRole="Category" />
+    <NavigationProperty Name="Comments" Relationship="Self.FK_Comments_Blog" FromRole="Blog" ToRole="Comments" />
+  </EntityType>
+  <EntityType Name="Category">
+    <Key>
+      <PropertyRef Name="CategoryId" />
+    </Key>
+    <Property Name="CategoryId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="Description" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="Blogs" Relationship="Self.FK_Blog_Category" FromRole="Category" ToRole="Blog" />
+  </EntityType>
+  <EntityType Name="Comment">
+    <Key>
+      <PropertyRef Name="CommentId" />
+    </Key>
+    <Property Name="CommentId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="BlogPostId" Type="Int32" Nullable="false" />
+    <Property Name="CommentText" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="CommenterName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="DatePosted" Type="DateTime" Nullable="false" Precision="3" />
+    <NavigationProperty Name="Blog" Relationship="Self.FK_Comments_Blog" FromRole="Comments" ToRole="Blog" />
+  </EntityType>
+  <Association Name="FK_Blog_Category">
+    <End Role="Category" Type="Self.Category" Multiplicity="1" />
+    <End Role="Blog" Type="Self.Blog" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Category">
+        <PropertyRef Name="CategoryId" />
+      </Principal>
+      <Dependent Role="Blog">
+        <PropertyRef Name="CategoryId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Comments_Blog">
+    <End Role="Blog" Type="Self.Blog" Multiplicity="1" />
+    <End Role="Comments" Type="Self.Comment" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Blog">
+        <PropertyRef Name="BlogPostId" />
+      </Principal>
+      <Dependent Role="Comments">
+        <PropertyRef Name="BlogPostId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="BlogEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="Blogs" EntityType="Self.Blog" />
+    <EntitySet Name="Categories" EntityType="Self.Category" />
+    <EntitySet Name="Comments" EntityType="Self.Comment" />
+    <AssociationSet Name="FK_Blog_Category" Association="Self.FK_Blog_Category">
+      <End Role="Category" EntitySet="Categories" />
+      <End Role="Blog" EntitySet="Blogs" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Comments_Blog" Association="Self.FK_Comments_Blog">
+      <End Role="Blog" EntitySet="Blogs" />
+      <End Role="Comments" EntitySet="Comments" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>

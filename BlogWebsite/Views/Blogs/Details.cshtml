@@ -1,0 +1,98 @@
+﻿@model BlogWebsite.Blog
+
+@{
+    ViewBag.Title = "Blog Details";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.Title)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Title)
+                </dd>
+
+                <hr />
+
+                <dt class="col-sm-3">
+                    Content
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.PostContent)
+                </dd>
+
+                <hr />
+
+                <dt class="col-sm-3">
+                    Author
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.AuthorName)
+                </dd>
+
+                <hr />
+
+                <dt class="col-sm-3">
+                    Post Date
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.DatePosted)
+                </dd>
+
+                <hr />
+
+                <dt class="col-sm-3">
+                    Image
+                </dt>
+                <dd class="col-sm-9">
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                        <img src="@Url.Content(Model.ImageUrl)" alt="Blog Image" class="img-fluid" style="max-width: 200px;" />
+                    }
+                    else
+                    {
+                        <span>No Image Available</span>
+                    }
+                </dd>
+
+                <hr />
+
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.IsPublished)
+                </dt>
+                <dd class="col-sm-9">
+                    @if (Model.IsPublished)
+                    {
+                        <span class="badge bg-success">✓ Yes</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">✗ No</span>
+                    }
+                </dd>
+
+                <hr />
+
+                <dt class="col-sm-3">
+                    Category
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Category.Name)
+                </dd>
+            </dl>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <p>
+            @Html.ActionLink("Edit", "Edit", new { id = Model.BlogPostId }, new { @class = "btn btn-primary" })
+        </p>
+    </div>
+</div>
+
+<p>
+    @Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-outline-secondary" })
+</p>

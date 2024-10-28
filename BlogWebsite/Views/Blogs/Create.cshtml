@@ -1,0 +1,125 @@
+﻿@model BlogWebsite.Blog
+
+@{
+    ViewBag.Title = "Create Blog";
+}
+
+@using (Html.BeginForm("Create", "Blogs", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+<div class="form-horizontal container mt-4">
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    <!-- Title -->
+    <div class="form-group row mb-3">
+        <!-- Added mb-3 for bottom margin -->
+        @Html.LabelFor(model => model.Title, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <!-- Author Name -->
+    <div class="form-group row mb-3">
+        <!-- Added mb-3 for bottom margin -->
+        @Html.LabelFor(model => model.AuthorName, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.AuthorName, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.AuthorName, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <!-- Category -->
+    <div class="form-group row mb-3">
+        <!-- Added mb-3 for bottom margin -->
+        @Html.LabelFor(model => model.CategoryId, "Category", htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownList("CategoryId", (SelectList)ViewBag.Categories, "Select Category", htmlAttributes: new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.CategoryId, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <!-- Image Upload -->
+    <div class="form-group row mb-3">
+        <!-- Added mb-3 for bottom margin -->
+        @Html.LabelFor(model => model.ImageUrl, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            <input type="file" name="ImageUpload" class="form-control" />
+            @Html.ValidationMessageFor(model => model.ImageUrl, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <!-- Is Published - Radio Buttons -->
+    <div class="form-group row mb-3">
+        @Html.Label("Is Published", htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            <div class="radio">
+                <label>
+                    @Html.RadioButton("IsPublished", true, new { @checked = "checked" }) Publish Now
+                </label>
+            </div>
+            <div class="radio">
+                <label>
+                    @Html.RadioButton("IsPublished", false) Publish Later
+                </label>
+            </div>
+            @Html.ValidationMessageFor(model => model.IsPublished, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+
+    <!-- Post Content -->
+    <div class="form-group row mb-3">
+        <!-- Added mb-3 for bottom margin -->
+        @Html.LabelFor(model => model.PostContent, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.TextAreaFor(model => model.PostContent, new { @class = "form-control", rows = 10, id = "postContent" }) <!-- Larger text area -->
+            @Html.ValidationMessageFor(model => model.PostContent, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="form-group row">
+        <div class="col-md-offset-2 col-md-10 mt-4">
+            <input type="submit" value="Create" class="btn btn-success" />
+        </div>
+    </div>
+</div>
+
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-outline-secondary mt-2" })
+</div>
+
+<!-- Place the first <script> tag in your HTML's <head> -->
+<script src="https://cdn.tiny.cloud/1/zxcfr29snvbp7hxi9l7svqvdrd7m2c1drcwluhd3fjsi2nva/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+
+<!-- Place the following <script> and <textarea> tags your HTML's <body> -->
+<script>
+    tinymce.init({
+        selector: 'textarea',
+        plugins: [
+            // Core editing features
+            'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'image', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount',
+            // Your account includes a free trial of TinyMCE premium features
+            // Try the most popular premium features until Nov 11, 2024:
+            'checklist', 'mediaembed', 'casechange', 'export', 'formatpainter', 'pageembed', 'a11ychecker', 'tinymcespellchecker', 'permanentpen', 'powerpaste', 'advtable', 'advcode', 'editimage', 'advtemplate', 'ai', 'mentions', 'tinycomments', 'tableofcontents', 'footnotes', 'mergetags', 'autocorrect', 'typography', 'inlinecss', 'markdown',
+            // Early access to document converters
+            'importword', 'exportword', 'exportpdf'
+        ],
+        toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+        tinycomments_mode: 'embedded',
+        tinycomments_author: 'Author name',
+        mergetags_list: [
+            { value: 'First.Name', title: 'First Name' },
+            { value: 'Email', title: 'Email' },
+        ],
+        ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant')),
+        exportpdf_converter_options: { 'format': 'Letter', 'margin_top': '1in', 'margin_right': '1in', 'margin_bottom': '1in', 'margin_left': '1in' },
+        exportword_converter_options: { 'document': { 'size': 'Letter' } },
+        importword_converter_options: { 'formatting': { 'styles': 'inline', 'resets': 'inline', 'defaults': 'inline', } },
+    });
+</script>

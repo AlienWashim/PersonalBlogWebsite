@@ -1,0 +1,188 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        /* Inline CSS for layout adjustments */
+        #wrapper {
+            display: flex;
+            width: 100%;
+        }
+
+        #sidebar-wrapper {
+            min-height: 100vh;
+            width: 220px; /* Increased width */
+            background: RGB(163, 184, 224); /* New background color */
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start; /* Change from center to flex-start for left alignment */
+            color: white; /* Change text color for visibility */
+        }
+
+        #page-content-wrapper {
+            flex: 1;
+            padding: 0px;
+        }
+
+        .sidebar-heading {
+            padding: 15px;
+            font-weight: bold;
+            text-align: left; /* Align text to the left */
+            color:black;
+            margin-bottom: 15px;
+            width: 100%; /* Full width */
+            display: flex;
+            justify-content: space-between; /* Keep space between text and icon */
+            align-items: center; /* Center vertically */
+        }
+
+        .list-group-item {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start; /* Change from center to flex-start for left alignment */
+            width: 100%; /* Full width */
+            padding: 10px;
+            text-decoration: none; /* Remove underline from links */
+            color: white; /* Change link text color for visibility */
+            border: none; /* Remove border */
+        }
+
+            .list-group-item i {
+                margin-right: 10px;
+                flex-shrink: 0; /* Prevent icon from shrinking */
+            }
+
+        .toggle-menu {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem; /* Increased size for visibility */
+            color: white; /* Icon color */
+        }
+
+        .dropdown-divider {
+            width: 80%; /* Width of the separator */
+            margin: 10px auto; /* Center the separator */
+        }
+
+
+
+        .icon-only {
+            display: none;
+        }
+
+        .toggled #sidebar-wrapper {
+            width: 80px; /* Width when toggled */
+        }
+
+        .toggled .sidebar-heading span {
+            display: none; /* Hide text when toggled */
+        }
+
+        .toggled .list-group-item span {
+            display: none; /* Hide text of items when toggled */
+        }
+
+        .toggled .list-group-item i {
+            display: inline; /* Show icon when toggled */
+            width: 100%;
+        }
+
+        .list-group-item:hover {
+            background: #495057; /* Change background on hover */
+        }
+    </style>
+</head>
+<body>
+    <div id="wrapper">
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+            <div class="sidebar-heading">
+                <span>Admin Dashboard</span>
+                <button class="toggle-menu btn btn-link" id="menu-toggle" aria-label="Toggle Menu">
+                    <i class="fas fa-bars"></i> <!-- Toggle Icon -->
+                </button>
+            </div>
+
+            <div class="sidebar-heading">
+                @Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "nav-link" })
+            </div>
+
+            <div class="list-group list-group-flush">
+                <!-- First Section -->
+                <div class="list-group-item container-fluid @(ViewContext.RouteData.Values["controller"].ToString() == "Blogs" ? "active" : "")">
+                    <a href="@Url.Action("Index", "Blogs")" class="d-flex align-items-center text-decoration-none text-dark w-100">
+                        <i class="fas fa-blog me-2"></i><span>Blog</span>
+                    </a>
+                </div>
+                <div class="list-group-item @(ViewContext.RouteData.Values["controller"].ToString() == "Categories" ? "active" : "")">
+                    <a href="@Url.Action("Index", "Categories")" class="d-flex align-items-center text-decoration-none text-dark w-100">
+                        <i class="fas fa-th-list me-2"></i><span>Category</span>
+                    </a>
+                </div>
+                <div class="list-group-item @(ViewContext.RouteData.Values["controller"].ToString() == "Comments" ? "active" : "")">
+                    <a href="@Url.Action("Index", "Comments")" class="d-flex align-items-center text-decoration-none text-dark w-100">
+                        <i class="fas fa-comments me-2"></i><span>Comments</span>
+                    </a>
+                </div>
+
+                <div class="dropdown-divider"></div>
+
+                <div class="list-group-item @(ViewContext.RouteData.Values["controller"].ToString() == "Account" && ViewContext.RouteData.Values["action"].ToString() == "Profile" ? "active" : "")">
+                    <a href="@Url.Action("Profile", "Account")" class="d-flex align-items-center text-decoration-none text-black">
+                        <i class="fas fa-user me-2"></i><span>Profile</span>
+                    </a>
+                </div>
+                <div class="list-group-item @(ViewContext.RouteData.Values["controller"].ToString() == "Account" && ViewContext.RouteData.Values["action"].ToString() == "Settings" ? "active" : "")">
+                    <a href="@Url.Action("Settings", "Account")" class="d-flex align-items-center text-decoration-none text-black">
+                        <i class="fas fa-cog me-2"></i><span>Settings</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- /#sidebar-wrapper -->
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <nav class="navbar navbar-expand-lg  border-bottom shadow-sm" style="background-color: #D2E0FB;">
+                <h5 class="navbar-brand p-2">@ViewBag.Title</h5>
+                <div class="navbar-collapse collapse justify-content-end">
+                    @Html.Partial("_LoginPartial")
+                </div>
+            </nav>
+
+            <div class="container-fluid">
+                @RenderBody()
+            </div>
+        </div>
+        <!-- /#page-content-wrapper -->
+    </div>
+    <!-- /#wrapper -->
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+
+    <script>
+        // Toggle the sidebar menu
+        $("#menu-toggle").click(function (e) {
+            e.preventDefault();
+            $("#wrapper").toggleClass("toggled");
+        });
+    </script>
+
+    <!-- Font Awesome for Icons -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="~/Scripts/jquery.min.js"></script>
+    <script src="~/Scripts/bootstrap.bundle.min.js"></script>
+</body>
+</html>

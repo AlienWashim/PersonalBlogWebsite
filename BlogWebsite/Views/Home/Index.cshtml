@@ -1,0 +1,346 @@
+﻿@model IEnumerable<BlogWebsite.Blog>
+
+<!-- Search and Filter Section -->
+<div class="search-filter d-flex justify-content-between align-items-center mb-4 border p-4 shadow-sm mt-2">
+    <!-- Category Filter (leftmost) -->
+    <select id="categoryFilter" class="form-control w-auto">
+        <option value="">All Categories</option>
+        @foreach (var category in ViewBag.Categories)
+        {
+            <option value="@category.CategoryId">@category.Name</option>
+        }
+    </select>
+
+    <!-- Search Input and Button (rightmost) -->
+    <div class="d-flex ml-auto gap-2">
+        <input type="text" id="searchInput" placeholder="Search by Title or Author" class="form-control mr-2" />
+        <button id="searchButton" class="btn btn-outline-primary">Search</button>
+    </div>
+</div>
+
+@if (Model == null || !Model.Any())
+{
+    <p>No blog posts available.</p>
+}
+else
+{
+<div id="blogPosts">
+    @foreach (var blog in Model.Where(b => b.IsPublished).OrderByDescending(b => b.DatePosted))
+    {
+        <div class="blog-post card mt-4" data-title="@blog.Title.ToLower()" data-author="@blog.AuthorName.ToLower()" data-category="@blog.Category.CategoryId">
+            <div class="card-body">
+                <h3 class="shadow-sm p-2">@blog.Title</h3>
+                <p><strong>Author:</strong> @blog.AuthorName</p>
+                <p><strong>Category:</strong> @blog.Category.Name</p>
+
+                <div style="display: flex; justify-content: space-between;">
+                    <div style="flex-grow: 1;">
+                        @{
+                            var content = blog.PostContent; // Assuming PostContent is a string with line breaks and paragraphs
+                        }
+                        <div style="text-align: justify;" class="border mt-1 p-2">
+                            @Html.Raw(content.Replace(Environment.NewLine, "<br />"))
+                        </div>
+                        <p style="text-align: left;">
+                            <small>Posted on @blog.DatePosted.ToShortDateString()</small>
+                        </p>
+                    </div>
+                    <img src="@Url.Content(blog.ImageUrl)" alt="Blog Image"
+                         style="min-width: 450px; width: 400px; height: auto; margin-left: 10px; object-fit: cover;" />
+                </div>
+
+                <div class="comments-section d-flex justify-content-between align-items-center mb-3 mt-2">
+                    <!-- Comments Section -->
+                    <div class="comments-section">
+                        <button class="btn btn-outline-secondary" onclick="toggleComments('@blog.BlogPostId')">Show Comments</button>
+                        <button class="btn btn-outline-primary" onclick="toggleCommentForm('@blog.BlogPostId')">Add Comment</button>
+
+                        <div id="comments-@blog.BlogPostId" style="display: none;">
+                            @foreach (var comment in blog.Comments)
+                            {
+                                <div class="comment mt-4" style="border: 1px solid #ccc; margin: 5px 0; padding: 10px;">
+                                    <p><strong>@comment.CommenterName:</strong> @comment.CommentText</p>
+                                    <small style="margin-top: 5px; display: block;">Commented on: @comment.DatePosted.ToShortDateString()</small>
+                                </div>
+                            }
+                        </div>
+
+                        <div id="comment-form-@blog.BlogPostId" style="display: none;">
+                            @using (Html.BeginForm("Create", "Comments", FormMethod.Post))
+                            {
+                                @Html.AntiForgeryToken()
+                                @Html.Hidden("BlogPostId", blog.BlogPostId)
+
+                                <div class="form-group">
+                                    @Html.Label("Your Name")
+                                    @Html.TextBox("CommenterName", null, new { @class = "form-control", required = "required" })
+                                    @Html.ValidationMessage("CommenterName", "", new { @class = "text-danger" })
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.Label("Comment Text")
+                                    @Html.TextArea("CommentText", null, new { @class = "form-control", rows = 3, required = "required" })
+                                    @Html.ValidationMessage("CommentText", "", new { @class = "text-danger" })
+                                </div>
+
+                                <button type="submit" class="btn btn-primary mt-2">Submit</button>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Share Button (rightmost) -->
+                    <div class="text-right">
+                        <button class="shareButton btn btn-success" style="display: inline-flex; align-items: center;" onclick="openSharePopup('@blog.BlogPostId', '@blog.Title')">
+                            <i class="fa fa-share-alt" style="margin-right: 5px;"></i> Share
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+}
+
+
+
+<!-- Share Modal -->
+<div id="shareModal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Share This Post</h5>
+
+            </div>
+            <div class="modal-body">
+                <p id="shareMessage">Share this blog post!</p>
+                <div class="input-group gap-2">
+                    <input type="text" id="shareLink" class="form-control" readonly />
+                    <button class="btn btn-outline-secondary" id="CopyText" onclick="copyShareLink()" title="Copy Link">
+                        <i class="fa fa-copy"></i> Copy
+                    </button>
+                </div>
+
+                <div class="social-share mt-3">
+                    <button class="btn btn-outline-primary" onclick="shareOnPlatform('facebook')" title="Share on Facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </button>
+                    <button class="btn btn-outline-info" onclick="shareOnPlatform('twitter')" title="Share on Twitter">
+                        <i class="fab fa-twitter"></i>
+                    </button>
+                    <button class="btn btn-outline-danger" onclick="shareOnPlatform('linkedin')" title="Share on LinkedIn">
+                        <i class="fab fa-linkedin-in"></i>
+                    </button>
+                    <button class="btn btn-outline-success" onclick="shareOnPlatform('whatsapp')" title="Share on WhatsApp">
+                        <i class="fab fa-whatsapp"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary" onclick="shareOnPlatform('email')" title="Share by Email">
+                        <i class="fas fa-envelope"></i>
+                    </button>
+                    <button class="btn btn-outline-info" onclick="shareOnPlatform('messenger')" title="Share on Messenger">
+                        <i class="fab fa-facebook-messenger"></i>
+                    </button>
+                </div>
+
+
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeSharePopup()">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // Function to copy the share link to the clipboard
+    function copyShareLink() {
+        const shareLinkInput = document.getElementById("shareLink");
+        shareLinkInput.setSelectionRange(0, 99999); // For mobile devices
+
+        // Use the Clipboard API to copy the text
+        navigator.clipboard.writeText(shareLinkInput.value)
+            .then(() => {
+                const copyButton = document.getElementById('CopyText'); // Get the copy button
+                copyButton.innerHTML = '<i class="fa fa-check"></i> Copied'; // Change button text to "Copied"
+
+                // Revert back to "Copy" after 2 seconds
+                setTimeout(() => {
+                    copyButton.innerHTML = '<i class="fa fa-copy"></i> Copy'; // Change button text back to "Copy"
+                }, 2000); // Adjust time (2000 ms = 2 seconds)
+            })
+            .catch(err => {
+                console.error('Failed to copy: ', err); // Log any errors
+            });
+    }
+
+    // Share on various platforms
+    function shareOnPlatform(platform) {
+        const link = document.getElementById("shareLink").value;
+        let shareUrl;
+
+        switch (platform) {
+            case 'facebook':
+                shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`;
+                break;
+            case 'twitter':
+                shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(link)}&text=Check%20this%20out!`;
+                break;
+            case 'linkedin':
+                shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(link)}`;
+                break;
+            case 'whatsapp':
+                shareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(link)}`;
+                break;
+            case 'email':
+                const subject = "Check out this blog post!";
+                const body = `I thought you might find this interesting: ${link}`;
+                shareUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                break;
+            case 'messenger':
+                shareUrl = `https://www.messenger.com/share?link=${encodeURIComponent(link)}`;
+                break;
+            default:
+                return; // Exit if platform is not recognized
+        }
+
+        window.open(shareUrl, '_blank'); // Open share link in new tab
+    }
+
+
+    // Add event listeners for search and filter
+    document.getElementById("searchButton").addEventListener("click", searchBlogs);
+    document.getElementById("categoryFilter").addEventListener("change", filterByCategory);
+
+    // Add event listener for 'Enter' key press
+    document.getElementById("searchInput").addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault(); // Prevent form submission or page reload
+            searchBlogs(); // Trigger the search function
+        }
+    });
+
+    // Clear the category filter on search input change
+    document.getElementById("searchInput").addEventListener("input", () => {
+        document.getElementById("categoryFilter").value = ""; // Clear the category filter on search input
+    });
+
+    // Search functionality
+    function searchBlogs() {
+        const searchValue = document.getElementById("searchInput").value.toLowerCase();
+        const blogs = document.querySelectorAll(".blog-post");
+
+        blogs.forEach(blog => {
+            const title = blog.getAttribute("data-title");
+            const author = blog.getAttribute("data-author");
+
+            // Show blog if it matches the search, otherwise hide it
+            if (title.includes(searchValue) || author.includes(searchValue)) {
+                blog.style.display = "block";
+            } else {
+                blog.style.display = "none";
+            }
+        });
+
+        // Clear the category filter when search is performed
+        document.getElementById("categoryFilter").value = "";
+    }
+
+    // Filter functionality
+    function filterByCategory() {
+        const selectedCategory = document.getElementById("categoryFilter").value;
+        const blogs = document.querySelectorAll(".blog-post");
+
+        // If no category is selected, show all blogs
+        if (selectedCategory === "") {
+            blogs.forEach(blog => blog.style.display = "block");
+            return;
+        }
+
+        // Filter by category
+        blogs.forEach(blog => {
+            const category = blog.getAttribute("data-category");
+
+            if (category === selectedCategory) {
+                blog.style.display = "block";
+            } else {
+                blog.style.display = "none";
+            }
+        });
+
+        // Clear the search input when a category is selected
+        document.getElementById("searchInput").value = "";
+    }
+
+    function toggleComments(blogPostId) {
+        const commentsSection = document.getElementById(`comments-${blogPostId}`);
+        commentsSection.style.display = commentsSection.style.display === "none" ? "block" : "none";
+    }
+
+    function toggleCommentForm(blogPostId) {
+        const commentForm = document.getElementById(`comment-form-${blogPostId}`);
+        commentForm.style.display = commentForm.style.display === "none" ? "block" : "none";
+    }
+
+    // Open share popup
+    function openSharePopup(blogPostId, blogTitle) {
+        const shareLink = `https://alienwashim.com/blog/${blogPostId}`; // Replace with your actual blog link
+        document.getElementById("shareLink").value = shareLink;
+        document.getElementById("shareMessage").innerText = `Title: "${blogTitle}"`;
+        document.getElementById("shareModal").style.display = "block"; // Show modal
+    }
+
+    // Close share popup
+    function closeSharePopup() {
+        document.getElementById("shareModal").style.display = "none"; // Hide modal
+    }
+
+    // Modal styling
+    window.onclick = function (event) {
+        const modal = document.getElementById("shareModal");
+        if (event.target === modal) {
+            closeSharePopup();
+        }
+    }
+
+    // Ensure comments and forms are toggled correctly (removed duplicate function definitions)
+</script>
+
+
+<style>
+
+    body {
+        background-color: #F3F8FF;
+    }
+    /* Modal styling */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+
+    .modal-dialog {
+        margin: 15% auto; /* 15% from the top and centered */
+        width: 80%; /* Could be more or less, depending on screen size */
+    }
+
+    .social-share {
+        display: flex;
+        gap: 10px;
+    }
+
+        .social-share button {
+            flex-grow: 1; /* Make buttons occupy equal space */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+</style>

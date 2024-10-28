@@ -1,0 +1,43 @@
+﻿@model BlogWebsite.Models.IndexViewModel
+
+@{
+    ViewBag.Title = "Manage Profile";
+}
+
+<main aria-labelledby="title" class="container mt-5">
+
+    <div class="card shadow-sm mt-4">
+        <div class="card-body">
+            <h4 class="mb-4">Change Your Account Settings</h4>
+            <hr />
+            <dl class="row">
+
+                <dt class="col-sm-4">Password:</dt>
+                <dd class="col-sm-8">
+                    @if (Model.HasPassword)
+                    {
+                        @Html.ActionLink("Change your password", "ChangePassword", new { @class = "btn btn-link" })
+                    }
+                    else
+                    {
+                        @Html.ActionLink("Create", "SetPassword", new { @class = "btn btn-link" })
+                    }
+                </dd>
+
+                <dt class="col-sm-4">External Logins:</dt>
+                <dd class="col-sm-8">
+                    @Model.Logins.Count
+                    @Html.ActionLink("Manage", "ManageLogins", new { @class = "btn btn-link" })
+                </dd>
+
+                <dt class="col-sm-4">Two-Factor Authentication:</dt>
+                <dd class="col-sm-8">
+                    <p>
+                        There are no two-factor authentication providers configured. See <a href="https://go.microsoft.com/fwlink/?LinkId=403804">this article</a>
+                        for details on setting up this ASP.NET application to support two-factor authentication.
+                    </p>
+                </dd>
+            </dl>
+        </div>
+    </div>
+</main>

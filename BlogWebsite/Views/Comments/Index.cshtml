@@ -1,0 +1,98 @@
+﻿@model IEnumerable<BlogWebsite.Comment>
+
+@{
+    ViewBag.Title = "Comments List";
+
+    // Extract unique blog titles for the dropdown filter
+    var uniqueBlogTitles = Model.Select(c => c.Blog.Title).Distinct().ToList();
+}
+
+<div class="container">
+    <h2>Comments List</h2>
+
+    <table class="table table-bordered mt-2">
+        <thead>
+            <tr class="text-center align-middle">
+                <th class="align-middle">
+                    Commenter Name
+                </th>
+
+                <th class="align-middle">
+                    Comment
+                </th>
+
+                <th class="align-middle">
+                    Date
+                </th>
+
+                <!-- Blog Title with Filter Dropdown -->
+                <th class="align-middle">
+                    <div class="d-flex flex-column align-items-center">
+                        <select id="blogTitleFilter" class="form-select form-select-sm mt-1 text-center" style="width: 100%; max-width: 650px;">
+                            <option value="all">All</option>
+                            @foreach (var title in uniqueBlogTitles)
+                            {
+                                <option value="@title">@title</option>
+                            }
+                        </select>
+                        Blog Title
+                    </div>
+                </th>
+
+                <th class="align-middle">
+                    Action
+                </th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr class="text-center comment-row" data-title="@item.Blog.Title">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CommenterName)
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CommentText)
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DatePosted)
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Blog.Title)
+                    </td>
+                    <td>
+                        <a href="@Url.Action("Details", new { id = item.CommentId })" class="btn btn-sm btn-success" style="margin-left: 5px;">
+                            <i class="fas fa-eye"></i> View
+                        </a>
+                        <a href="@Url.Action("Delete", new { id = item.CommentId })" class="btn btn-sm btn-danger">
+                            <i class="fas fa-trash-alt"></i> Remove
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<script>
+    document.getElementById('blogTitleFilter').addEventListener('change', function() {
+        var selectedTitle = this.value.toLowerCase();
+        
+        // Get all rows with class 'comment-row'
+        var rows = document.querySelectorAll('.comment-row');
+        
+        rows.forEach(function(row) {
+            var rowTitle = row.getAttribute('data-title').toLowerCase();
+            
+            if (selectedTitle === 'all' || rowTitle === selectedTitle) {
+                row.style.display = ''; // Show row
+            } else {
+                row.style.display = 'none'; // Hide row
+            }
+        });
+    });
+</script>

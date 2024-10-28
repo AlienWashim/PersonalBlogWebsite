@@ -1,0 +1,152 @@
+﻿@model BlogWebsite.Blog
+
+@{
+    ViewBag.Title = "Edit Blog";
+}
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="container mt-4">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.BlogPostId)
+
+        <div class="form-horizontal col-lg-12">
+            <!-- Title Field -->
+            <div class="form-group row mb-3">
+                @Html.LabelFor(model => model.Title, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <!-- Post Content Field -->
+            <div class="form-group row mb-3">
+                @Html.LabelFor(model => model.PostContent, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.TextArea("PostContent", Model.PostContent, new { @class = "form-control", rows = "10", @id = "postContent" }) <!-- Larger text area -->
+                    @Html.ValidationMessageFor(model => model.PostContent, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+
+
+
+            <!-- Author Name Field -->
+            <div class="form-group row mb-3">
+                @Html.LabelFor(model => model.AuthorName, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.AuthorName, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.AuthorName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <!-- Date Posted Field -->
+            <div class="form-group row mb-3">
+                @Html.LabelFor(model => model.DatePosted, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DisplayFor(model => model.DatePosted, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.HiddenFor(model => model.DatePosted) <!-- Keep the hidden field for later use -->
+                    @Html.ValidationMessageFor(model => model.DatePosted, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group row mb-3">
+                @Html.LabelFor(model => model.CategoryId, "Category", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor(model => model.CategoryId, (IEnumerable<SelectListItem>)ViewBag.CategoryList, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.CategoryId, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+
+
+
+            <!-- Current Image -->
+            <div class="form-group row mb-3">
+                @Html.Label("Current Image", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                        <img src="@Url.Content(Model.ImageUrl)" alt="Product Image" style="max-width: 300px; height: auto;" />
+                    }
+                    else
+                    {
+                        <span>No image available</span>
+                    }
+                </div>
+            </div>
+
+            <!-- Change Image Field -->
+            <div class="form-group row mb-3">
+                @Html.Label("Change Image", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <input type="file" name="imageUrl" class="form-control" />
+                    @Html.ValidationMessage("ImageUrl", "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <!-- Publication Status -->
+            <div class="form-group row mb-3">
+                @Html.Label("Publication Status", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <div class="form-check">
+                        @Html.RadioButtonFor(model => model.IsPublished, true, new { @class = "form-check-input", id = "published" })
+                        @Html.Label("published", "Published", new { @class = "form-check-label", @for = "published" })
+                    </div>
+                    <div class="form-check">
+                        @Html.RadioButtonFor(model => model.IsPublished, false, new { @class = "form-check-input", id = "unpublished" })
+                        @Html.Label("unpublished", "Unpublished", new { @class = "form-check-label", @for = "unpublished" })
+                    </div>
+                    @Html.ValidationMessageFor(model => model.IsPublished, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Save" class="btn btn-primary" />
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-outline-secondary" })
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+
+<!-- Place the first <script> tag in your HTML's <head> -->
+<script src="https://cdn.tiny.cloud/1/zxcfr29snvbp7hxi9l7svqvdrd7m2c1drcwluhd3fjsi2nva/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+
+<!-- Place the following <script> and <textarea> tags your HTML's <body> -->
+<script>
+    tinymce.init({
+        selector: '#postContent',
+        plugins: [
+            'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'image', 'link', 'lists', 'media', 'searchreplace',
+            'table', 'visualblocks', 'wordcount', 'checklist', 'mediaembed', 'casechange', 'export', 'formatpainter',
+            'pageembed', 'a11ychecker', 'tinymcespellchecker', 'permanentpen', 'powerpaste', 'advtable', 'advcode',
+            'editimage', 'advtemplate', 'ai', 'mentions', 'tinycomments', 'tableofcontents', 'footnotes', 'mergetags',
+            'autocorrect', 'typography', 'inlinecss', 'markdown', 'importword', 'exportword', 'exportpdf'
+        ],
+        toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+        tinycomments_mode: 'embedded',
+        tinycomments_author: 'Author name',
+        mergetags_list: [
+            { value: 'First.Name', title: 'First Name' },
+            { value: 'Email', title: 'Email' },
+        ],
+        ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant')),
+        exportpdf_converter_options: { 'format': 'Letter', 'margin_top': '1in', 'margin_right': '1in', 'margin_bottom': '1in', 'margin_left': '1in' },
+        exportword_converter_options: { 'document': { 'size': 'Letter' } },
+        importword_converter_options: { 'formatting': { 'styles': 'inline', 'resets': 'inline', 'defaults': 'inline', } },
+    });
+</script>

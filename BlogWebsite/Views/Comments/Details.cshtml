@@ -1,0 +1,36 @@
+﻿@model BlogWebsite.Comment
+
+@{
+    ViewBag.Title = "Comment Details";
+}
+
+<div class="container mt-5">
+    <h2 class="mb-4">@ViewBag.Title</h2>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.CommentText)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.CommentText)</dd>
+
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.CommenterName)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.CommenterName)</dd>
+
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.DatePosted)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.DatePosted)</dd>
+
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Blog.Title)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Blog.Title)</dd>
+            </dl>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <p>
+            <a href="@Url.Action("Delete", new { id = Model.CommentId })" class="btn btn-sm btn-danger">
+                <i class="fas fa-trash-alt"></i> Remove
+            </a> |
+            @Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-secondary" })
+        </p>
+    </div>
+</div>

@@ -1,0 +1,104 @@
+﻿@model BlogWebsite.Blog
+
+@{
+    ViewBag.Title = Model.Title; // Set the title of the page
+}
+
+<div class="container mt-4">
+    <h1>@Html.DisplayFor(m => m.Title)</h1>
+    <p>By @Html.DisplayFor(m => m.AuthorName) | Category: @Html.DisplayFor(m => m.Category.Name)</p>
+
+    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+    {
+        <img src="@Url.Content(Model.ImageUrl)" alt="Blog Image" class="img-fluid" />
+    }
+
+    <div class="mt-3">
+        @Html.Raw(Model.PostContent) <!-- Display the blog content -->
+    </div>
+
+    <p class="text-muted mt-2">Posted on: @Html.DisplayFor(m => m.DatePosted)</p>
+
+    <div class="mt-4">
+        <h4>Share this blog:</h4>
+        <a href="#" class="btn btn-primary">Share on Facebook</a>
+        <a href="#" class="btn btn-info">Share on Twitter</a>
+        <!-- Add other sharing options as needed -->
+    </div>
+
+    <div class="mt-5">
+        <h4>Comments</h4>
+        <button id="toggleComments" class="btn btn-secondary">Show Comments</button>
+
+        <div id="commentsSection" style="display:none;" class="mt-3">
+            <ul id="commentList" class="list-unstyled">
+                @foreach (var comment in Model.Comments)
+                {
+                    <li class="media mb-3">
+                        <div class="media-body">
+                            <h5 class="mt-0 mb-1">@Html.DisplayFor(m => comment.CommenterName) <small class="text-muted">@Html.DisplayFor(m => comment.DatePosted)</small></h5>
+                            @Html.Raw(comment.Comment)
+                        </div>
+                    </li>
+                }
+            </ul>
+
+            <h5>Add a Comment</h5>
+            <form id="commentForm">
+                <div class="mb-3">
+                    <input type="text" class="form-control" placeholder="Your Name" id="commenterName" required />
+                </div>
+                <div class="mb-3">
+                    <textarea class="form-control" placeholder="Your Comment" id="commentText" required></textarea>
+                </div>
+                <input type="hidden" id="blogPostId" value="@Model.BlogPostId" />
+                <button type="submit" class="btn btn-success">Submit Comment</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#toggleComments').click(function () {
+                $('#commentsSection').toggle();
+            });
+
+            $('#commentForm').submit(function (event) {
+                event.preventDefault();
+
+                var commenterName = $('#commenterName').val();
+                var commentText = $('#commentText').val();
+                var blogPostId = $('#blogPostId').val();
+                var postDate = new Date().toLocaleString(); // Get current date
+
+                // Assuming you have a method to save the comment to the database via AJAX
+                $.ajax({
+                    url: '@Url.Action("AddComment", "Blog")', // Adjust URL as necessary
+                    type: 'POST',
+                    data: {
+                        Comment: commentText,
+                        CommenterName: commenterName,
+                        BlogPostId: blogPostId,
+                        DatePosted: postDate
+                    },
+                    success: function (data) {
+                        // Append the new comment to the comment list
+                        $('#commentList').append(
+                            '<li class="media mb-3"><div class="media-body"><h5 class="mt-0 mb-1">' + commenterName +
+                            ' <small class="text-muted">' + postDate + '</small></h5>' + commentText + '</div></li>'
+                        );
+
+                        // Clear the form fields
+                        $('#commenterName').val('');
+                        $('#commentText').val('');
+                    },
+                    error: function (xhr, status, error) {
+                        alert('Error occurred while posting comment: ' + error);
+                    }
+                });
+            });
+        });
+    </script>
+}

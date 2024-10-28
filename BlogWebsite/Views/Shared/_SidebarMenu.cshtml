@@ -1,0 +1,12 @@
+﻿@* _SidebarMenu.cshtml *@
+<div class="bg-light border-right" id="sidebar-wrapper">
+    <div class="sidebar-heading">Admin Menu</div>
+    <div class="list-group list-group-flush">
+        <a href="@Url.Action("Index", "Blogs")" class="list-group-item list-group-item-action bg-light">Blog</a>
+        <a href="@Url.Action("Index", "Categories")" class="list-group-item list-group-item-action bg-light">Category</a>
+        <a href="@Url.Action("Index", "Comments")" class="list-group-item list-group-item-action bg-light">Comments</a>
+        <div class="list-group-divider"></div>
+        <a href="@Url.Action("Profile", "Account")" class="list-group-item list-group-item-action bg-light">Profile</a>
+        <a href="@Url.Action("Settings", "Account")" class="list-group-item list-group-item-action bg-light">Settings</a>
+    </div>
+</div>

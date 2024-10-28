@@ -1,0 +1,10 @@
+﻿@{
+    if (User.Identity.IsAuthenticated)
+    {
+        Layout = "~/Views/Shared/_AdminLayout.cshtml"; // Layout for unauthenticated users
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_Layout.cshtml"; // Layout for authenticated users
+    }
+}

@@ -1,0 +1,55 @@
+﻿@model BlogWebsite.Category
+
+@{
+    ViewBag.Title = "Edit Category";
+}
+
+<div class="container mt-5 mb-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">Edit Category</h2>
+        </div>
+        <div class="card-body">
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="form-horizontal">
+                    @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+                    @Html.HiddenFor(model => model.CategoryId)
+
+                    <!-- Category Name Field -->
+                    <div class="form-group row mb-3">
+                        @Html.LabelFor(model => model.Name, "Category Name", htmlAttributes: new { @class = "col-md-3 col-form-label font-weight-bold" })
+                        <div class="col-md-9">
+                            @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <!-- Description Field -->
+                    <div class="form-group row mb-3">
+                        @Html.LabelFor(model => model.Description, "Description", htmlAttributes: new { @class = "col-md-3 col-form-label font-weight-bold" })
+                        <div class="col-md-9">
+                            @Html.TextAreaFor(model => model.Description, new { @class = "form-control", rows = "6" }) <!-- Larger text area -->
+                            @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="form-group row">
+                        <div class="col-md-9 offset-md-3">
+                            <button type="submit" class="btn btn-primary px-4">Save</button>
+                            @Html.ActionLink("Cancel", "Index", null, new { @class = "btn btn-secondary ml-2" })
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
